@@ -37,6 +37,7 @@ def process_image():
             if results.pose_landmarks:
                 landmarks = results.pose_landmarks.landmark
                 for i, landmark in enumerate(landmarks):
+                    # Get the name of the landmark from the PoseLandmark enum
                     landmark_name = mp_pose.PoseLandmark(i).name
                     
                     keypoints_data.append({

@@ -7,7 +7,7 @@ import 'package:intl/intl.dart';
 import '../providers/pose_provider.dart';
 import '../../data/models/pose_data_model.dart';
 import 'pose_detail_screen.dart'; 
-import '../widgets/shimmer_loading_card.dart'; 
+import '../widgets/shimmer_loading_card.dart';
 
 class HistoryScreen extends StatelessWidget {
   const HistoryScreen({super.key});
@@ -18,12 +18,25 @@ class HistoryScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Analysis History'),
       ),
+      // Removed the unsupported 'listener' property from Consumer.
       body: Consumer<PoseProvider>(
         builder: (context, provider, child) {
+          // Show SnackBar if there's an error message
+          if (provider.errorMessage != null) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(provider.errorMessage!),
+                  backgroundColor: Colors.redAccent,
+                ),
+              );
+              provider.clearErrorMessage();
+            });
+          }
           if (provider.isLoading && provider.history.isEmpty) {
             return ListView.builder(
               padding: const EdgeInsets.all(16.0),
-              itemCount: 5, 
+              itemCount: 5,
               itemBuilder: (context, index) => const ShimmerLoadingCard(),
             );
           }
@@ -62,6 +75,7 @@ class HistoryScreen extends StatelessWidget {
   }
 
   Widget _buildHistoryCard(BuildContext context, PoseData pose) {
+    // This widget remains the same
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       child: InkWell(
@@ -129,6 +143,7 @@ class HistoryScreen extends StatelessWidget {
   }
 
   void _showImageSourceDialog(BuildContext context) {
+    // This method remains the same
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
