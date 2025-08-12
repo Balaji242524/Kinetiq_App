@@ -34,7 +34,8 @@ class PoseRepository {
       final keypointsJson = await _apiService.getKeypointsFromImage(imageFile);
       if (keypointsJson == null) {
         throw Exception('Failed to get keypoints from the backend API.');
-      }
+     }
+     
 
       final poseData = PoseData(
         timestamp: DateTime.now(),

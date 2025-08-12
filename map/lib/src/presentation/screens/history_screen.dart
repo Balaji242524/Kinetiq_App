@@ -1,11 +1,13 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../providers/pose_provider.dart';
 import '../../data/models/pose_data_model.dart';
 import 'pose_detail_screen.dart'; 
+import '../widgets/shimmer_loading_card.dart'; 
 
 class HistoryScreen extends StatelessWidget {
   const HistoryScreen({super.key});
@@ -14,16 +16,20 @@ class HistoryScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pose History'),
+        title: const Text('Analysis History'),
       ),
       body: Consumer<PoseProvider>(
         builder: (context, provider, child) {
           if (provider.isLoading && provider.history.isEmpty) {
-            return const Center(child: CircularProgressIndicator());
+            return ListView.builder(
+              padding: const EdgeInsets.all(16.0),
+              itemCount: 5, 
+              itemBuilder: (context, index) => const ShimmerLoadingCard(),
+            );
           }
           if (provider.history.isEmpty) {
             return const Center(
-              child: Text('No history found.'),
+              child: Text('No sessions yet. Start your first analysis.'),
             );
           }
 
@@ -50,7 +56,7 @@ class HistoryScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showImageSourceDialog(context),
-        child: const Icon(Icons.add_a_photo),
+        child: const Icon(Icons.add_chart),
       ),
     );
   }
@@ -98,7 +104,7 @@ class HistoryScreen extends StatelessWidget {
                   children: [
                     Text(
                       DateFormat('MMMM d, yyyy').format(pose.timestamp),
-                      style: const TextStyle(
+                      style: GoogleFonts.inter(
                         fontWeight: FontWeight.w600,
                         fontSize: 16,
                       ),
@@ -106,7 +112,7 @@ class HistoryScreen extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       DateFormat.jm().format(pose.timestamp),
-                      style: TextStyle(
+                      style: GoogleFonts.inter(
                         color: Colors.white.withOpacity(0.7),
                         fontSize: 14,
                       ),
@@ -126,13 +132,13 @@ class HistoryScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Select Image Source'),
+        title: const Text('New Analysis'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
               leading: const Icon(Icons.camera_alt),
-              title: const Text('Camera'),
+              title: const Text('From Camera'),
               onTap: () {
                 Navigator.of(context).pop();
                 context.read<PoseProvider>().processImageFromCamera();
@@ -140,7 +146,7 @@ class HistoryScreen extends StatelessWidget {
             ),
             ListTile(
               leading: const Icon(Icons.photo_library),
-              title: const Text('Gallery'),
+              title: const Text('From Gallery'),
               onTap: () {
                 Navigator.of(context).pop();
                 context.read<PoseProvider>().processImageFromGallery();
