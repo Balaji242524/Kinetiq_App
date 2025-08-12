@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../providers/pose_provider.dart';
+import 'pose_detail_screen.dart';
 
 class HistoryScreen extends StatelessWidget {
   const HistoryScreen({super.key});
@@ -44,10 +45,18 @@ class HistoryScreen extends StatelessWidget {
                   title: Text(
                     DateFormat.yMMMd().add_jms().format(pose.timestamp),
                   ),
-                  subtitle: Text(
-                      '${(jsonDecode(pose.keypointsJson)['keypoints'] as List).length} keypoints'),
+                  subtitle: Text('Tap to view pose'),
+                  trailing: IconButton( 
+                    icon: const Icon(Icons.code),
+                    onPressed: () => _showKeypointsDialog(context, pose.keypointsJson),
+                  ),
                   onTap: () {
-                    _showKeypointsDialog(context, pose.keypointsJson);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PoseDetailScreen(poseData: pose),
+                      ),
+                    );
                   },
                 ),
               );
