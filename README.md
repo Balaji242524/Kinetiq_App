@@ -1,6 +1,8 @@
-# Kinetiq - AI Pose Analysis
+<div style="display: flex; justify-content: center">
+  <img src='./assets/kinetiq.png' height="250px"/>
+</div>
 
-Kinetiq is a modern FitTech application built with Flutter that allows users to analyze their posture and movement. It captures an image, sends it to a Python backend for MediaPipe keypoint extraction, and provides a visual overlay of the detected pose. The results are saved locally and synced to the cloud.
+**Kinetiq** is a modern FitTech application built with Flutter that allows users to analyze their posture and movement. It captures an image, sends it to a Python backend for MediaPipe keypoint extraction, and provides a visual overlay of the detected pose. The results are saved locally and synced to the cloud.
 
 ## Features
 
@@ -25,7 +27,8 @@ To run this project, you need to set up both the Flutter frontend and the Python
     * Create a new project on the [Firebase Console](https://console.firebase.google.com/).
     * Enable *Firestore Database* and *Firebase Storage*.
     * *Crucially, set up your security rules* for development. Go to the "Rules" tab for both Firestore and Storage and set them to allow reads/writes:
-        
+
+        ```bash
         // Firestore Rules
         rules_version = '2';
         service cloud.firestore {
@@ -45,46 +48,45 @@ To run this project, you need to set up both the Flutter frontend and the Python
             }
           }
         }
-        
+        ```
         *Warning*: These rules are for development only. Secure your rules before production.
-    * Install the FlutterFire CLI and run flutterfire configure in your project root to connect your app to Firebase. This will generate the firebase_options.dart file.
+    * Install the FlutterFire CLI and run ```flutterfire configure``` in your project root to connect your app to Firebase. This will generate the firebase_options.dart file.
 
 3.  *Project Dependencies*:
     * Run flutter pub get to install all the dependencies listed in pubspec.yaml.
 
 4.  *Backend URL Configuration*:
     * Open the file lib/src/data/datasources/api_service.dart.
-    * Change the _baseUrl variable to your computer's local network IP address where the Python backend will be running (e.g., http://192.168.1.7:5000).
+    * Change the _baseUrl variable to your computer's local network IP address where the Python backend will be running (e.g., http://193.162.1.7:5000).
 
 #### B. Python Backend Setup
 
 1.  *Prerequisites*: Python 3.x installed.
 
-2.  *Create Project Folder*:
-    * Create a new folder on your computer (e.g., kinetiq_backend).
-    * Inside it, create app.py and requirements.txt with the code provided.
+2.  *Project Folder*:
+    * Inside the backend folder, there will be app.py and requirements.txt with the code provided.
 
 3.  *Set Up Virtual Environment (Windows)*:
-    sh
+    ```sh
     # Navigate to your backend folder
-    cd kinetiq_backend
+    cd backend
 
     # Create a virtual environment
     python -m venv venv
 
     # Activate it
     .\venv\Scripts\activate
-    
+    ```
 
 4.  *Install Dependencies*:
-    sh
+    ```sh
     pip install -r requirements.txt
-    
+    ```
 
 5.  *Run the Server*:
-    sh
+    ```sh
     python app.py
-    
+    ```
     The server will start on port 5000 and will now be ready to accept requests from the Flutter app.
 
 ## Description of Architecture
