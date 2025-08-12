@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 import '../models/pose_data_model.dart';
 import '../datasources/sqlite_helper.dart';
 import '../datasources/api_service.dart';
@@ -16,11 +17,17 @@ class PoseRepository {
     return await _localDB.getPoses();
   }
 
-  Future<bool> captureAndProcessImage() async {
+  Future<bool> processNewImage(ImageSource source) async {
     try {
-      final imageFile = await _imagePicker.pickImageFromCamera();
+      final File? imageFile;
+      if (source == ImageSource.camera) {
+        imageFile = await _imagePicker.pickImageFromCamera();
+      } else {
+        imageFile = await _imagePicker.pickImageFromGallery();
+      }
+      
       if (imageFile == null) {
-        AppLogger.log('Image capture was cancelled by the user.');
+        AppLogger.log('Image selection was cancelled by the user.');
         return false;
       }
 
@@ -49,9 +56,7 @@ class PoseRepository {
   Future<void> _syncToFirebase(File imageFile, PoseData poseData) async {
     try {
       final imageUrl = await _firebaseService.uploadImage(imageFile);
-
       final finalImageUrl = imageUrl ?? 'upload_failed';
-
       await _firebaseService.savePoseToFirestore(poseData.keypointsJson, finalImageUrl);
       
       if(imageUrl != null) {
@@ -59,7 +64,6 @@ class PoseRepository {
       } else {
         AppLogger.log('Sync to Firestore completed, but image upload failed. Used dummy URL.');
       }
-
     } catch (e, s) {
       AppLogger.log('Sync to Firebase failed.', error: e, stackTrace: s);
     }

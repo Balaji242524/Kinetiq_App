@@ -4,6 +4,7 @@ import '../../core/logger.dart';
 
 class ImagePickerService {
   final ImagePicker _picker = ImagePicker();
+
   Future<File?> pickImageFromCamera() async {
     try {
       AppLogger.log('Opening camera...');

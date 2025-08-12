@@ -12,7 +12,7 @@ class HistoryScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('History'),
+        title: const Text('Pose History'),
       ),
       body: Consumer<PoseProvider>(
         builder: (context, provider, child) {
@@ -24,7 +24,6 @@ class HistoryScreen extends StatelessWidget {
               child: Text('No history found. Press the camera button to start.'),
             );
           }
-
           return ListView.builder(
             itemCount: provider.history.length,
             itemBuilder: (context, index) {
@@ -58,9 +57,39 @@ class HistoryScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          context.read<PoseProvider>().captureAndProcessImage();
+          _showImageSourceDialog(context);
         },
-        child: const Icon(Icons.camera_alt),
+        child: const Icon(Icons.add_a_photo),
+      ),
+    );
+  }
+
+  void _showImageSourceDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Select Image Source'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Camera'),
+              onTap: () {
+                Navigator.of(context).pop();
+                context.read<PoseProvider>().processImageFromCamera();
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Gallery'),
+              onTap: () {
+                Navigator.of(context).pop();
+                context.read<PoseProvider>().processImageFromGallery();
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -68,7 +97,6 @@ class HistoryScreen extends StatelessWidget {
   void _showKeypointsDialog(BuildContext context, String jsonString) {
     const jsonEncoder = JsonEncoder.withIndent('  ');
     final prettyJson = jsonEncoder.convert(jsonDecode(jsonString));
-
     showDialog(
       context: context,
       builder: (context) => AlertDialog(

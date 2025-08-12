@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../data/models/pose_data_model.dart';
 import '../../data/repositories/pose_repository.dart';
 import '../../core/logger.dart';
 
 class PoseProvider extends ChangeNotifier {
   final PoseRepository _repo = PoseRepository();
-  
   bool _isLoading = false;
   List<PoseData> _history = [];
   String? _errorMessage;
@@ -30,11 +30,19 @@ class PoseProvider extends ChangeNotifier {
     _setLoading(false);
   }
 
-  Future<void> captureAndProcessImage() async {
+  Future<void> processImageFromCamera() async {
+    await _processImage(ImageSource.camera);
+  }
+
+  Future<void> processImageFromGallery() async {
+    await _processImage(ImageSource.gallery);
+  }
+
+  Future<void> _processImage(ImageSource source) async {
     _setLoading(true);
     _errorMessage = null;
 
-    final success = await _repo.captureAndProcessImage();
+    final success = await _repo.processNewImage(source);
     
     if (success) {
       await fetchHistory();
