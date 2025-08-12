@@ -1,10 +1,11 @@
 import 'dart:io';
-import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../providers/pose_provider.dart';
-import 'pose_detail_screen.dart';
+import '../../data/models/pose_data_model.dart';
+import 'pose_detail_screen.dart'; 
 
 class HistoryScreen extends StatelessWidget {
   const HistoryScreen({super.key});
@@ -22,53 +23,101 @@ class HistoryScreen extends StatelessWidget {
           }
           if (provider.history.isEmpty) {
             return const Center(
-              child: Text('No history found. Press the camera button to start.'),
+              child: Text('No history found.'),
             );
           }
-          return ListView.builder(
-            itemCount: provider.history.length,
-            itemBuilder: (context, index) {
-              final pose = provider.history[index];
-              return Card(
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: ListTile(
-                  leading: SizedBox(
-                    width: 60,
-                    height: 60,
-                    child: Image.file(
-                      File(pose.localImagePath),
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) =>
-                          const Icon(Icons.image_not_supported, size: 40),
+
+          return AnimationLimiter(
+            child: ListView.builder(
+              padding: const EdgeInsets.all(16.0),
+              itemCount: provider.history.length,
+              itemBuilder: (context, index) {
+                final pose = provider.history[index];
+                return AnimationConfiguration.staggeredList(
+                  position: index,
+                  duration: const Duration(milliseconds: 375),
+                  child: SlideAnimation(
+                    verticalOffset: 50.0,
+                    child: FadeInAnimation(
+                      child: _buildHistoryCard(context, pose),
                     ),
                   ),
-                  title: Text(
-                    DateFormat.yMMMd().add_jms().format(pose.timestamp),
-                  ),
-                  subtitle: Text('Tap to view pose'),
-                  trailing: IconButton( 
-                    icon: const Icon(Icons.code),
-                    onPressed: () => _showKeypointsDialog(context, pose.keypointsJson),
-                  ),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => PoseDetailScreen(poseData: pose),
-                      ),
-                    );
-                  },
-                ),
-              );
-            },
+                );
+              },
+            ),
           );
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _showImageSourceDialog(context);
-        },
+        onPressed: () => _showImageSourceDialog(context),
         child: const Icon(Icons.add_a_photo),
+      ),
+    );
+  }
+
+  Widget _buildHistoryCard(BuildContext context, PoseData pose) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PoseDetailScreen(poseData: pose),
+            ),
+          );
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Row(
+            children: [
+              Hero(
+                tag: pose.localImagePath,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8.0),
+                  child: Image.file(
+                    File(pose.localImagePath),
+                    width: 70,
+                    height: 70,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) =>
+                        Container(
+                          width: 70,
+                          height: 70,
+                          color: Colors.grey[800],
+                          child: const Icon(Icons.image_not_supported, size: 30)
+                        ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      DateFormat('MMMM d, yyyy').format(pose.timestamp),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      DateFormat.jm().format(pose.timestamp),
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.7),
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(Icons.chevron_right, color: Colors.white.withOpacity(0.5)),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -99,26 +148,6 @@ class HistoryScreen extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  void _showKeypointsDialog(BuildContext context, String jsonString) {
-    const jsonEncoder = JsonEncoder.withIndent('  ');
-    final prettyJson = jsonEncoder.convert(jsonDecode(jsonString));
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Keypoints JSON'),
-        content: SingleChildScrollView(
-          child: Text(prettyJson),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
-          ),
-        ],
       ),
     );
   }

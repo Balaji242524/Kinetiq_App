@@ -18,18 +18,23 @@ class PosePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white
-      ..strokeWidth = 2.0;
+
+    final linePaint = Paint()
+      ..color = const Color(0xFF00B0FF)
+      ..strokeWidth = 15.0
+      ..strokeCap = StrokeCap.round;
 
     final pointPaint = Paint()
-      ..color = Colors.yellow
-      ..strokeWidth = 8.0;
+      ..color = const Color(0xFFF50057) 
+      ..strokeWidth = 10.0;
 
+
+
+    final imagePaint = Paint();
     final imageSize = Size(image.width.toDouble(), image.height.toDouble());
     final src = Offset.zero & imageSize;
     final dst = Offset.zero & size;
-    canvas.drawImageRect(image, src, dst, paint);
+    canvas.drawImageRect(image, src, dst, imagePaint);
 
     for (var connection in connections) {
       final p1Index = connection[0];
@@ -44,14 +49,14 @@ class PosePainter extends CustomPainter {
         final dx2 = p2['x'] * size.width;
         final dy2 = p2['y'] * size.height;
 
-        canvas.drawLine(Offset(dx1, dy1), Offset(dx2, dy2), paint);
+        canvas.drawLine(Offset(dx1, dy1), Offset(dx2, dy2), linePaint);
       }
     }
 
     for (var point in keypoints) {
       final dx = point['x'] * size.width;
       final dy = point['y'] * size.height;
-      canvas.drawCircle(Offset(dx, dy), 4, pointPaint);
+      canvas.drawCircle(Offset(dx, dy), 5, pointPaint);
     }
   }
 
