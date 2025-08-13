@@ -63,7 +63,7 @@ class PoseRepository {
       if(imageUrl != null) {
         AppLogger.log('Sync to Firebase completed successfully.');
       } else {
-        AppLogger.log('Sync to Firestore completed, but image upload failed. Used dummy URL.');
+        AppLogger.log('Sync to Firestore completed, but image upload failed. Used URL.');
       }
     } catch (e, s) {
       AppLogger.log('Sync to Firebase failed.', error: e, stackTrace: s);

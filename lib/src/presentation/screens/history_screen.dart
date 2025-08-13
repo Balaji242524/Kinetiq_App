@@ -18,10 +18,8 @@ class HistoryScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Analysis History'),
       ),
-      // Removed the unsupported 'listener' property from Consumer.
       body: Consumer<PoseProvider>(
         builder: (context, provider, child) {
-          // Show SnackBar if there's an error message
           if (provider.errorMessage != null) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -75,7 +73,6 @@ class HistoryScreen extends StatelessWidget {
   }
 
   Widget _buildHistoryCard(BuildContext context, PoseData pose) {
-    // This widget remains the same
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       child: InkWell(
@@ -143,7 +140,6 @@ class HistoryScreen extends StatelessWidget {
   }
 
   void _showImageSourceDialog(BuildContext context) {
-    // This method remains the same
     showDialog(
       context: context,
       builder: (context) => AlertDialog(

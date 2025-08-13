@@ -18,7 +18,6 @@ class PoseProvider extends ChangeNotifier {
     fetchHistory();
   }
 
-  // NEW METHOD: Clears the error message state.
   void clearErrorMessage() {
     _errorMessage = null;
   }
